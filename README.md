@@ -61,8 +61,9 @@ Or install it yourself as:
 
    time = Time.local(2022, 1, 3, 12, 0)
    cron_parser.next(time)
-   # => 2022-03-31 09:00
+   # => 2022-03-13 09:00
  ```
+https://www.timeanddate.com/calendar/
 
 ## Development
 
