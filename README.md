@@ -1,8 +1,10 @@
 # parse-cron-ext
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/parse/cron/ext`. To experiment with that code, run `bin/console` for an interactive prompt.
+parse-cron-ext is a extension (monkey-patch) for parse-cron 0.1.4, which is the latest version.  
+siebertm/parse-cron: https://github.com/siebertm/parse-cron
 
-TODO: Delete this and the text above, and describe your gem
+Warning:   
+All specs written in parse-cron passed, but Use at your own risk.
 
 ## Installation
 Add this line to your application's Gemfile:
@@ -20,8 +22,47 @@ Or install it yourself as:
     $ gem install parse-cron-ext
 
 ## Usage
+ These notations are inspired by [AWS Cron Expressions](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html).
+ 
 
-TODO: Write usage instructions here
+### End of the month by using L notation
+ ```ruby
+   cron_parser = CronParser.new('0 9 L * *')
+
+   time = Time.local(2022, 1, 16, 12, 0)
+   cron_parser.next(time)
+   # => 2022-01-31 09:00
+   
+   time = Time.local(2022, 2, 3, 12, 0)
+   cron_parser.next(time)
+   # => 2022-02-28 09:00
+   
+   
+   # end of March
+   cron_parser = CronParser.new('0 9 L 3 *')
+
+   time = Time.local(2022, 2, 3, 12, 0)
+   cron_parser.next(time)
+   # => 2022-03-31 09:00
+ ```
+
+### Second Sunday, Third Friday...
+ ```ruby
+   # second sunday
+   cron_parser = CronParser.new('0 9 * * SUN#2')
+
+   time = Time.local(2022, 1, 3, 12, 0)
+   cron_parser.next(time)
+   # => 2022-01-09 09:00
+   
+
+   # second sunday in march
+   cron_parser = CronParser.new('0 9 * 3 SUN#2')
+
+   time = Time.local(2022, 1, 3, 12, 0)
+   cron_parser.next(time)
+   # => 2022-03-31 09:00
+ ```
 
 ## Development
 
@@ -31,13 +72,12 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/parse-cron-ext. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/parse-cron-ext/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/a5-stable/parse-cron-ext. 
+This project is intended to be a safe, welcoming space for collaboration!
 
+Any Pull Requests or Issues to improve it will be gladly welcome.
+I will check them and react as soon as possible.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Parse::Cron::Ext project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/parse-cron-ext/blob/master/CODE_OF_CONDUCT.md).
