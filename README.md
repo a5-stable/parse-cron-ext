@@ -23,8 +23,9 @@ Or install it yourself as:
 
 ## Usage
  These notations are inspired by [AWS Cron Expressions](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html).
- 
-
+  
+    
+You can express...
 ### End of the month by using L notation
  ```ruby
    cron_parser = CronParser.new('0 9 L * *')
