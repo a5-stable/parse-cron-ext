@@ -13,10 +13,10 @@ class CronParser
       else
         if SUBELEMENT_REGEX === subel
           if $6 # with range
-            stepped_range($1.to_i..$3.to_i, $6.to_i)
+            stepped_range($1.to_i..$4.to_i, $6.to_i)
           elsif $4 # range without step
             stepped_range($1.to_i..$4.to_i, 1)
-          elsif $1 == "l"
+          elsif $1 == "l" && time_specs_key == :dom
             [$1]
           else # just a numeric
             @dow_offset = $7.to_i if $7
@@ -34,14 +34,12 @@ class CronParser
 
   protected
 
-  def stepped_range(rng, step = 1)
-    len = rng.last - rng.first
-
-    num = len.div(step)
-    result = (0..num).map { |i| rng.first + step * i }
-
-    result.pop if result[-1] == rng.last and rng.exclude_end?
-    result
+  def recursive_calculate(meth,time,num)
+    array = [time]
+    num.-(1).times do |num|
+      array << self.send(meth, array.last)
+    end
+    array
   end
 
   def nudge_date(t, dir = :next, can_nudge_month = true)
@@ -57,7 +55,7 @@ class CronParser
   def nudge_month(t, dir = :next)
     spec = time_specs[:month][1]
     next_value = find_best_next(t.month, spec, dir)
-    t.month = next_value || spec.first
+    t.month = next_value || (dir == :next ? spec.first : spec.last)
 
     nudge_year(t, dir) if next_value.nil?
 
