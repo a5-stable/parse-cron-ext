@@ -3,7 +3,7 @@ require 'date'
 require 'parse-cron'
 
 class CronParser
-  SUBELEMENT_REGEX = %r{^(\d+|l)(-(\d+)(/(\d+))?)?$}
+  SUBELEMENT_REGEX = %r{^(\d+|l)((-(\d+)(/(\d+))?)?|#(\d+))$}
 
   def parse_element(elem, allowed_range, time_specs_key=nil)
     values = elem.split(',').map do |subel|
@@ -12,13 +12,14 @@ class CronParser
         stepped_range(allowed_range, step)
       else
         if SUBELEMENT_REGEX === subel
-          if $5 # with range
-            stepped_range($1.to_i..$3.to_i, $5.to_i)
-          elsif $3 # range without step
-            stepped_range($1.to_i..$3.to_i, 1)
+          if $6 # with range
+            stepped_range($1.to_i..$3.to_i, $6.to_i)
+          elsif $4 # range without step
+            stepped_range($1.to_i..$4.to_i, 1)
           elsif $1 == "l"
             [$1]
           else # just a numeric
+            @dow_offset = $7.to_i if $7
             [$1.to_i]
           end
         else
@@ -31,8 +32,46 @@ class CronParser
     [Set.new(values), values, elem]
   end
 
-
   protected
+
+  def stepped_range(rng, step = 1)
+    len = rng.last - rng.first
+
+    num = len.div(step)
+    result = (0..num).map { |i| rng.first + step * i }
+
+    result.pop if result[-1] == rng.last and rng.exclude_end?
+    result
+  end
+
+  def nudge_date(t, dir = :next, can_nudge_month = true)
+    spec = interpolate_weekdays(t.year, t.month)[1]
+    spec = [spec[@dow_offset-1]] if @dow_offset
+
+    next_value = find_best_next(t.day, spec, dir)
+    t.day = next_value || (dir == :next ? spec.first : spec.last)
+
+    nudge_month(t, dir) if next_value.nil? && can_nudge_month
+  end
+
+  def nudge_month(t, dir = :next)
+    spec = time_specs[:month][1]
+    next_value = find_best_next(t.month, spec, dir)
+    t.month = next_value || spec.first
+
+    nudge_year(t, dir) if next_value.nil?
+
+    # we changed the month, so its likely that the date is incorrect now
+    valid_days = interpolate_weekdays(t.year, t.month)[1]
+    valid_days = [valid_days[@dow_offset-1]] if @dow_offset
+    t.day = dir == :next ? valid_days.first : valid_days.last
+  end
+
+  # returns a list of days which do both match time_spec[:dom] or time_spec[:dow]
+  def interpolate_weekdays(year, month)
+    @_interpolate_weekdays_cache ||= {}
+    @_interpolate_weekdays_cache["#{year}-#{month}"] ||= interpolate_weekdays_without_cache(year, month)
+  end
 
   def interpolate_weekdays_without_cache(year, month)
     t = Date.new(year, month, 1)
@@ -55,6 +94,7 @@ class CronParser
       result << t.mday if valid_mday.include?(t.mday) || valid_wday.include?(t.wday)
       t = t.succ
     end
+
     [Set.new(result), result]
   end
 
