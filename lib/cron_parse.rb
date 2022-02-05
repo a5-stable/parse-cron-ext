@@ -34,14 +34,6 @@ class CronParser
 
   protected
 
-  def recursive_calculate(meth,time,num)
-    array = [time]
-    num.-(1).times do |num|
-      array << self.send(meth, array.last)
-    end
-    array
-  end
-
   def nudge_date(t, dir = :next, can_nudge_month = true)
     spec = interpolate_weekdays(t.year, t.month)[1]
     spec = [spec[@dow_offset-1]] if @dow_offset
@@ -63,12 +55,6 @@ class CronParser
     valid_days = interpolate_weekdays(t.year, t.month)[1]
     valid_days = [valid_days[@dow_offset-1]] if @dow_offset
     t.day = dir == :next ? valid_days.first : valid_days.last
-  end
-
-  # returns a list of days which do both match time_spec[:dom] or time_spec[:dow]
-  def interpolate_weekdays(year, month)
-    @_interpolate_weekdays_cache ||= {}
-    @_interpolate_weekdays_cache["#{year}-#{month}"] ||= interpolate_weekdays_without_cache(year, month)
   end
 
   def interpolate_weekdays_without_cache(year, month)
