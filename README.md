@@ -1,4 +1,6 @@
 # parse-cron-ext
+[![Gem Version](https://badge.fury.io/rb/parse-cron-ext.svg)](https://badge.fury.io/rb/parse-cron-ext)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 parse-cron-ext is a extension (monkey-patch) for parse-cron 0.1.4, which is the latest version.  
 siebertm/parse-cron: https://github.com/siebertm/parse-cron
