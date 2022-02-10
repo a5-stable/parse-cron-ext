@@ -3,7 +3,7 @@ require 'date'
 require 'parse-cron'
 
 class CronParser
-  SUBELEMENT_REGEX = %r{^(\d+|l)((-(\d+)(/(\d+))?)?|#(\d+))$}
+  SUBELEMENT_REGEX = %r{^(\d+|l|w)((-(\d+)(/(\d+))?)?|#(\d+))$}
 
   def parse_element(elem, allowed_range, time_specs_key=nil)
     values = elem.split(',').map do |subel|
@@ -18,6 +18,8 @@ class CronParser
             stepped_range($1.to_i..$4.to_i, 1)
           elsif $1 == "l" && time_specs_key == :dom
             [$1]
+          elsif $1 == "w" && time_specs_key == :dow
+            [1, 2, 3, 4, 5]
           else # just a numeric
             @dow_offset = $7.to_i if $7
             [$1.to_i]
@@ -91,7 +93,7 @@ class CronParser
         :hour   => parse_element(tokens[1], 0..23), #hour
         :dom    => parse_element(tokens[2], 1..31, :dom), #DOM
         :month  => parse_element(tokens[3], 1..12), #mon
-        :dow    => parse_element(tokens[4], 0..6)  #DOW
+        :dow    => parse_element(tokens[4], 0..6, :dow) #DOW
       }
     end
   end
