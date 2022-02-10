@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.email         = ["sh07e1916@gmail.com"]
 
   spec.summary       = %q{parse-cron-ext is a extension (monkey-patch) for parse-cron 0.1.4, which is the latest version.}
-  spec.description   = %q{enable to specify "end of the month in March" or "Third Monday" in cron by extending of parse-cron.}
-  spec.homepage      = "https://yahoo.co.jp"
+  spec.description   = %q{enable to specify "end of the month", "end of the month in March", "Third Monday", and so on... in cron by extending of parse-cron.}
+  spec.homepage      = "https://github.com/a5-stable/parse-cron-ext"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
