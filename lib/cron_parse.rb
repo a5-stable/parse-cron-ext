@@ -35,35 +35,6 @@ class CronParser
     [Set.new(values), values, elem]
   end
 
-    # returns the next occurence after the given date
-    def next(now = @time_source.now, num = 1)
-      t = InternalTime.new(now, @time_source)
-
-      unless time_specs[:month][0].include?(t.month)
-        nudge_month(t)
-        t.day = 0
-      end
-  
-      unless interpolate_weekdays(t.year, t.month)[0].include?(t.day)
-        nudge_date(t)
-        t.hour = -1
-      end
-  
-      unless time_specs[:hour][0].include?(t.hour)
-        nudge_hour(t)
-        t.min = -1
-      end
-  
-      # always nudge the minute
-      nudge_minute(t)
-      t = t.to_time
-      if num > 1
-        recursive_calculate(:next,t,num)
-      else
-        t
-      end
-    end
-
   protected
 
   def nudge_date(t, dir = :next, can_nudge_month = true)
@@ -106,7 +77,6 @@ class CronParser
     valid_mday << (t.next_month - 1).day if valid_mday.include?("l")
 
     result = []
-
     while t.month == month
       result << t.mday if valid_mday.include?(t.mday) || valid_wday.include?(t.wday)
       t = t.succ
