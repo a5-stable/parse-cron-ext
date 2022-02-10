@@ -66,6 +66,17 @@ You can express...
    cron_parser.next(time)
    # => 2022-03-13 09:00
  ```
+ 
+ 
+### Weekday by using W notation
+ ```ruby
+   # next weekday
+   cron_parser = CronParser.new('0 0 * * W')
+
+   time = Time.local(2022, 2, 11, 12, 0)
+   cron_parser.next(time)
+   # => 2022-02-14 00:00
+ ```
 https://www.timeanddate.com/calendar/
 
 ## Development
