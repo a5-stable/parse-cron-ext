@@ -46,6 +46,8 @@ describe "CronParser#last" do
     ["0 9 * * SUN#4",         "2021-12-06 12:00",  "2021-11-28 09:00"],
     ["0 0 * * W",             "2022-02-10 00:00",  "2022-02-09 00:00"],
     ["0 0 * * W",             "2022-02-07 00:00",  "2022-02-04 00:00"],
+    ["0 0 * * 4L",             "2022-02-07 00:00",  "2022-02-25 00:00"],
+    ["0 0 * * 0L",             "2022-02-07 00:00",  "2022-02-27 00:00"],
   ].each do |line, now, expected_next|
     it "should return #{expected_next} for '#{line}' when now is #{now}" do
       now = parse_date(now)
